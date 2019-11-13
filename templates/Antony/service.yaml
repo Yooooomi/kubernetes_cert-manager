@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Release.Name }}-antony-service"
+  labels:
+{{ include "project.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.antony.service.type }}
+  ports:
+    - port: {{ .Values.antony.service.port }}
+      targetPort: {{ .Values.antony.apiPort }}
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: "{{ .Release.Name }}-antony-deployment"
+    app.kubernetes.io/instance: "{{ .Release.Name }}"

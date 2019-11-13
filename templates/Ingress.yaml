@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: "{{ .Release.Name }}-ingress"
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/issuer: "letsencrypt-staging"
+spec:
+  tls:
+    - hosts:
+      - "{{ .Values.issuer.host }}" # Your host. CHANGE ME
+      secretName: "{{ .Release.Name }}-cert-secret"
+  rules:
+    - host: "{{ .Values.issuer.host }}"
+      http:
+        paths:
+        # The * is needed so that all traffic gets redirected to nginx
+        # - path: /|/(.+)
+        - path: /(.*)
+          backend:
+            serviceName: "{{ .Release.Name }}-roger-service"
+            servicePort: {{ .Values.roger.service.port }}

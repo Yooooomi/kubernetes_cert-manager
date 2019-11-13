@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Release.Name }}-roger-deployment"
+  labels:
+{{ include "project.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.roger.deployment.replicaCount }}
+  selector:
+    matchLabels:
+      app: "{{ .Release.Name }}-roger-deployment"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Release.Name }}-roger-deployment"
+    spec:
+      containers:
+      - name: "{{ .Release.Name }}-roger-deployment-container"
+        imagePullPolicy: "{{ .Values.roger.image.pullPolicy }}"
+        image: "{{ .Values.roger.image.repository }}:{{ .Values.roger.image.tag }}"
+        env:
+          - name: ANTONY
+            value: "{{ .Release.Name }}-antony-service"
+        resources:
+            {{- toYaml .Values.roger.deployment.ressources }}
